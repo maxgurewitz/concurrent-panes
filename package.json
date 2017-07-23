@@ -2,8 +2,9 @@
   "name": "concurrent-panes",
   "version": "0.0.1",
   "description": "Run multiple processes concurrently and split output across multiple panes.",
-  "main": "dist/index.js",
+  "main": "dist/cli/index.js",
   "scripts": {
+    "start": "webpack-dev-server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -24,5 +25,18 @@
   "bugs": {
     "url": "https://github.com/maxgurewitz/concurrent-panes/issues"
   },
-  "homepage": "https://github.com/maxgurewitz/concurrent-panes#readme"
+  "homepage": "https://github.com/maxgurewitz/concurrent-panes#readme",
+  "devDependencies": {
+    "awesome-typescript-loader": "^3.2.1",
+    "source-map-loader": "^0.2.1",
+    "typescript": "^2.4.2",
+    "webpack": "^3.3.0",
+    "webpack-dev-server": "^2.5.0"
+  },
+  "dependencies": {
+    "@types/react": "^15.0.38",
+    "@types/react-dom": "^15.5.1",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1"
+  }
 }
