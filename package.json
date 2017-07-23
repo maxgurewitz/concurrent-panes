@@ -1,0 +1,28 @@
+{
+  "name": "concurrent-panes",
+  "version": "0.0.1",
+  "description": "Run multiple processes concurrently and split output across multiple panes.",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maxgurewitz/concurrent-panes.git"
+  },
+  "keywords": [
+    "concurrent",
+    "pane",
+    "gui",
+    "split",
+    "parallel",
+    "pipe",
+    "stdout"
+  ],
+  "author": "Max Gurewitz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/maxgurewitz/concurrent-panes/issues"
+  },
+  "homepage": "https://github.com/maxgurewitz/concurrent-panes#readme"
+}
