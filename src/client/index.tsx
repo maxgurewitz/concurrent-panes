@@ -2,11 +2,25 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 
 
-interface HelloProps { compiler: string; framework: string; }
+interface Source {}
 
-const Hello = (props: HelloProps) => <h1>Hello from {props.compiler} and {props.framework}!</h1>;
+interface State { sources: Source[] }
+
+class App extends React.Component<undefined, State> {
+    constructor() {
+      super();
+
+      this.state = {
+        sources: []
+      };
+    }
+
+    render() {
+        return <h1>hello world</h1>;
+    }
+}
 
 ReactDOM.render(
-    <Hello compiler="TypeScript" framework="React" />,
+    <App />,
     document.getElementById("js-app")
 );

@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "outDir": "./dist/",
+        "lib": ["es5", "es6", "dom"],
         "sourceMap": true,
         "noImplicitAny": true,
         "module": "commonjs",

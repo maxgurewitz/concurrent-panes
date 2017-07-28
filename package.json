@@ -4,8 +4,10 @@
   "description": "Run multiple processes concurrently and split output across multiple panes.",
   "main": "dist/cli/index.js",
   "scripts": {
-    "start": "webpack-dev-server",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "parallel start-server start-client",
+    "dev-process1": "while sleep 1; do echo foo; done",
+    "start-server": "nodemon --watch 'src/cli/*.ts' --exec 'ts-node' src/cli/bin.ts 'npm run dev-process1'",
+    "start-client": "webpack-dev-server"
   },
   "repository": {
     "type": "git",
@@ -27,16 +29,24 @@
   },
   "homepage": "https://github.com/maxgurewitz/concurrent-panes#readme",
   "devDependencies": {
+    "@types/react": "^15.0.38",
+    "@types/react-dom": "^15.5.1",
     "awesome-typescript-loader": "^3.2.1",
+    "nodemon": "^1.11.0",
+    "npm-parallel": "^2.0.1",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
     "source-map-loader": "^0.2.1",
+    "ts-node": "^3.3.0",
     "typescript": "^2.4.2",
-    "webpack": "^3.3.0",
+    "webpack": "^2.2.0",
     "webpack-dev-server": "^2.5.0"
   },
   "dependencies": {
-    "@types/react": "^15.0.38",
-    "@types/react-dom": "^15.5.1",
-    "react": "^15.6.1",
-    "react-dom": "^15.6.1"
+    "@types/node": "^8.0.15",
+    "@types/through": "0.0.28",
+    "@types/ws": "^3.0.2",
+    "through": "^2.3.8",
+    "ws": "^3.0.0"
   }
 }
