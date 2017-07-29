@@ -1,11 +1,11 @@
-import * as childProcess from 'child_process';
+import {spawn, ChildProcess} from 'child_process';
 import * as WebSocket from 'ws';
 import * as through from 'through';
 
 const process = global.process;
 
 function runTask(taskname: string) {
-  return childProcess.spawn('sh', ['-c', taskname], {
+  return spawn('sh', ['-c', taskname], {
     env: process.env,
     cwd: process.cwd()
   });
@@ -23,6 +23,55 @@ class CodedError extends Error {
     super(message);
     this.code = code;
   }
+}
+
+class ProcessHandler {
+
+  process: ChildProcess;
+
+  ws: WebSocket;
+
+  task: string;
+
+  constructor(task: string, process: ChildProcess) {
+    this.process = process;
+    this.task = task;
+    this.ws = null;
+  }
+
+  pipeProcessToWs(websocket: WebSocket) {
+    this.ws = websocket;
+    this.process.stderr.pipe(this.buildWsThrough(this.task, 'stderr'));
+    this.process.stdout.pipe(this.buildWsThrough(this.task, 'stdout'));
+  }
+
+  buildWsThrough(task: string, outputType: string): through.ThroughStream {
+    return through(
+      buffer =>
+        this.ws.send(JSON.stringify({
+          type: 'output',
+          task,
+          outputType,
+          message: String(buffer)
+        }), this.onSend),
+      () =>
+        this.ws.send(JSON.stringify({
+          type: 'end',
+          task,
+          outputType
+        }), this.onSend)
+    );
+  }
+
+  onSend(err: Error) {
+    if (err) {
+      console.error('Failed to send message: ', err);
+    }
+  }
+}
+
+function handleSocket(ws: WebSocket, existingProcesses?: ChildProcess[]): ChildProcess[] {
+  return [];
 }
 
 export default function parallel(tasks: string[], done: Callback) {
@@ -43,38 +92,36 @@ export default function parallel(tasks: string[], done: Callback) {
 
   const wss = new WebSocket.Server({ port: 3001 });
 
+  let handlers:  ProcessHandler[];
+
   wss.on('connection', ws => {
     ws.send(JSON.stringify({ type: 'init', tasks: tasks }));
 
-    tasks.forEach(task => {
-      const proc = runTask(task);
+    if (handlers) {
+      handlers.forEach(handler => {
+        handler.ws = ws;
+      });
+    } else {
+      handlers = tasks.map(task => {
+        const process = runTask(task);
 
-      proc.on('error', err => doneErr(new CodedError(task, 1, err.message)));
+        process.on('error', err => doneErr(new CodedError(task, 1, err.message)));
 
-      proc.on('close', code => {
-        if (code !== 0) {
-          const err = new CodedError(task, code);
-          doneErr(err);
-        } else {
-          doneOk();
-        }
-      })
+        process.on('close', code => {
+          if (code !== 0) {
+            const err = new CodedError(task, code);
+            doneErr(err);
+          } else {
+            doneOk();
+          }
+        });
 
-      const onSendErr = (err: Error) => {
-        if (err) {
-          console.error('failed to send message', err);
-        }
-      };
+        const handler = new ProcessHandler(task, process);
 
-      function sendMessage(task: string, outputType: string): through.ThroughStream {
-        return through(
-          buffer => ws.send(JSON.stringify({ type: 'output', task, outputType, message: String(buffer) }), onSendErr),
-            () => ws.send(JSON.stringify({ type: 'end', outputType }), onSendErr)
-        );
-      }
+        handler.pipeProcessToWs(ws);
 
-      proc.stderr.pipe(sendMessage(task, 'stderr'));
-      proc.stdout.pipe(sendMessage(task, 'stdout'));
-    });
+        return handler;
+      });
+    }
   });
 }
