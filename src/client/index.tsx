@@ -11,7 +11,7 @@ class App extends React.Component<undefined, State> {
 
   constructor() {
     super();
-
+    
     console.log('loc1');
     this.websocket = new WebSocket('ws://localhost:3001');
 
@@ -27,5 +27,5 @@ class App extends React.Component<undefined, State> {
 
 ReactDOM.render(
   <App />,
-  document.getElementById("js-app")
+  document.body
 );

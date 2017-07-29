@@ -5,8 +5,7 @@ import * as through from 'through';
 const process = global.process;
 
 function runTask(taskname: string) {
-  console.log('loc2', taskname);
-  return childProcess.spawn(taskname, [], {
+  return childProcess.spawn('sh', [taskname], {
     env: process.env,
     cwd: process.cwd()
   });
