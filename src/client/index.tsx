@@ -1,13 +1,30 @@
-import '../../node_modules/react-virtualized/styles.css';
+import 'react-virtualized/styles.css';
+import {List, ListRowRenderer} from 'react-virtualized/dist/es/List';
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
 interface Source {
-  content: string
+  content: string[]
 }
 
 interface State {
   [task: string]: Source
+}
+
+function rowRendererFactory(source: Source): ListRowRenderer {
+  const rowRenderer: ListRowRenderer = ({
+    key,
+    index,
+    style
+  }) => {
+    return (
+      <div key={ key } style={ style }>
+        { source.content[index] }
+      </div>
+    );
+  };
+
+  return rowRenderer;
 }
 
 class App extends React.Component<undefined, State> {
@@ -24,7 +41,7 @@ class App extends React.Component<undefined, State> {
         case 'init':
           this.setState((previousState: State) => {
             data.tasks.forEach((task: string) => {
-              previousState[task] = { content: '' };
+              previousState[task] = { content: [] };
             });
             return previousState;
           });
@@ -33,7 +50,7 @@ class App extends React.Component<undefined, State> {
         case 'output':
           this.setState((previousState: State) => {
             const previousTask = previousState[data.task];
-            previousTask.content = previousTask.content + data.message;
+            previousTask.content.push(data.message);;
             return previousState;
           });
           break;
@@ -44,17 +61,20 @@ class App extends React.Component<undefined, State> {
   }
 
   render() {
-    const panes = Object.keys(this.state).map((task, i) => {
+    const panes = Object.keys(this.state).map(task => {
       const source = this.state[task];
+
       return (
-        <div key={i}>
-          <div> { task } </div>
-          <div>
-            { source.content }
-          </div>
-        </div>
+          <List
+            width={1000}
+            height={50}
+            rowHeight={16}
+            rowCount={source.content.length}
+            rowRenderer={rowRendererFactory(source)}
+          />
       );
     });
+
 
     return (
       <div>
