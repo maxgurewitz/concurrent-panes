@@ -1,4 +1,5 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require('path');
 
 const appTitle = 'concurrent-panes';
 
@@ -17,6 +18,7 @@ module.exports = {
     extensions: ['.ts', '.tsx', '.js', '.json']
   },
 
+
   plugins: [
     new HtmlWebpackPlugin({
       title: 'concurrent-panes',
@@ -27,6 +29,11 @@ module.exports = {
   module: {
 
     rules: [
+      {
+        test: /\.css$/,
+        use: [ 'style-loader', 'css-loader' ]
+      },
+
       // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
       { test: /\.tsx?$/, loader: 'awesome-typescript-loader' },
 

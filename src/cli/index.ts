@@ -45,21 +45,25 @@ class ProcessHandler {
     this.process.stdout.pipe(this.buildWsThrough(this.task, 'stdout'));
   }
 
+  send(message: object) {
+    this.ws.send(JSON.stringify(message), this.onSend);
+  }
+
   buildWsThrough(task: string, outputType: string): through.ThroughStream {
     return through(
       buffer =>
-        this.ws.send(JSON.stringify({
+        this.send({
           type: 'output',
           task,
           outputType,
           message: String(buffer)
-        }), this.onSend),
+        }),
       () =>
-        this.ws.send(JSON.stringify({
+        this.send({
           type: 'end',
           task,
           outputType
-        }), this.onSend)
+        })
     );
   }
 

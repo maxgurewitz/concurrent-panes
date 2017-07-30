@@ -1,3 +1,4 @@
+import '../../node_modules/react-virtualized/styles.css';
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
@@ -66,7 +67,12 @@ class App extends React.Component<undefined, State> {
   }
 }
 
+const el = document.createElement("div");
+el.id = 'app';
+
+document.body.appendChild(el);
+
 ReactDOM.render(
   <App />,
-  document.body
+  el
 );
