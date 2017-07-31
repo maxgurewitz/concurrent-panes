@@ -6,7 +6,8 @@
   "scripts": {
     "start": "parallel start-server start-client",
     "dev-process1": "while sleep 1; do echo foo; done",
-    "start-server": "nodemon --watch 'src/cli/*.ts' --exec 'ts-node' src/cli/bin.ts 'npm run dev-process1'",
+    "dev-process2": "while sleep 1; do echo bar; done",
+    "start-server": "nodemon --watch 'src/cli/*.ts' --exec 'ts-node' src/cli/bin.ts 'npm run dev-process1' 'npm run dev-process2'",
     "start-client": "webpack-dev-server"
   },
   "repository": {

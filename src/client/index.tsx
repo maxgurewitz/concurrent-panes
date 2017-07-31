@@ -19,7 +19,7 @@ function rowRendererFactory(source: Source): ListRowRenderer {
   }) => {
     return (
       <div key={ key } style={ style }>
-        { source.content[index] }
+        { index + source.content[index] }
       </div>
     );
   };
@@ -71,6 +71,7 @@ class App extends React.Component<undefined, State> {
             rowHeight={16}
             rowCount={source.content.length}
             rowRenderer={rowRendererFactory(source)}
+            scrollToIndex={source.content.length - 1}
           />
       );
     });
