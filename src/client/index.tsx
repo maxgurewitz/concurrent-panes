@@ -4,8 +4,11 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 
 interface Source {
-  content: string[]
+  content: string[],
+  changedScrollPosition: boolean
 }
+
+const FONT_SIZE = 16;
 
 interface State {
   [task: string]: Source
@@ -27,6 +30,10 @@ function rowRendererFactory(source: Source): ListRowRenderer {
   return rowRenderer;
 }
 
+interface OnScroll {
+  (args: {clientHeight: number, scrollTop: number, scrollHeight: number}): void
+}
+
 class App extends React.Component<undefined, State> {
 
   constructor() {
@@ -41,7 +48,7 @@ class App extends React.Component<undefined, State> {
         case 'init':
           this.setState((previousState: State) => {
             data.tasks.forEach((task: string) => {
-              previousState[task] = { content: [] };
+              previousState[task] = { content: [], changedScrollPosition: false };
             });
             return previousState;
           });
@@ -61,18 +68,32 @@ class App extends React.Component<undefined, State> {
   }
 
   render() {
-    const panes = Object.keys(this.state).map(task => {
+    const panes = Object.keys(this.state).map((task, i) => {
       const source = this.state[task];
 
+      const onScroll: OnScroll = ({scrollTop, scrollHeight, clientHeight}) => {
+        this.setState(previousState => {
+          previousState[task].changedScrollPosition = Math.abs(scrollTop - scrollHeight) > Math.abs(clientHeight + FONT_SIZE);
+          return previousState;
+        });
+      };
+
+      const scrollToIndexProp = source.changedScrollPosition ?
+        {} :
+        { scrollToIndex: source.content.length - 1 };
+
       return (
-          <List
-            width={1000}
-            height={50}
-            rowHeight={16}
-            rowCount={source.content.length}
-            rowRenderer={rowRendererFactory(source)}
-            scrollToIndex={source.content.length - 1}
-          />
+          <div key={i}>
+            <List
+              width={1000}
+              height={50}
+              rowHeight={FONT_SIZE}
+              onScroll={onScroll}
+              rowCount={source.content.length}
+              rowRenderer={rowRendererFactory(source)}
+              {...scrollToIndexProp}
+            />
+          </div>
       );
     });
 
