@@ -1,5 +1,7 @@
 import 'react-virtualized/styles.css';
+import 'react-tabs/style/react-tabs.css';
 import {List, ListRowRenderer} from 'react-virtualized/dist/es/List';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
@@ -68,7 +70,7 @@ class App extends React.Component<undefined, State> {
   }
 
   render() {
-    const panes = Object.keys(this.state).map((task, i) => {
+    const tabPanels = Object.keys(this.state).map((task, i) => {
       const source = this.state[task];
 
       const onScroll: OnScroll = ({scrollTop, scrollHeight, clientHeight}) => {
@@ -83,7 +85,7 @@ class App extends React.Component<undefined, State> {
         { scrollToIndex: source.content.length - 1 };
 
       return (
-          <div key={i}>
+          <TabPanel key={i}>
             <List
               width={1000}
               height={50}
@@ -93,18 +95,24 @@ class App extends React.Component<undefined, State> {
               rowRenderer={rowRendererFactory(source)}
               {...scrollToIndexProp}
             />
-          </div>
+          </TabPanel>
       );
     });
 
+    const tabs = Object.keys(this.state).map(task => {
+      return (
+        <Tab> {task} </Tab>
+      );
+    });
 
     return (
-      <div>
-        <div> concurrent-panes </div>
-        <div>
-          { panes }
-        </div>
-      </div>
+      <Tabs>
+        <TabList>
+          { tabs }
+        </TabList>
+
+        { tabPanels }
+      </Tabs>
     );
   }
 }
