@@ -18,7 +18,6 @@ module.exports = {
     extensions: ['.ts', '.tsx', '.js', '.json']
   },
 
-
   plugins: [
     new HtmlWebpackPlugin({
       title: 'concurrent-panes',

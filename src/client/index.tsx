@@ -1,6 +1,8 @@
 import 'react-virtualized/styles.css';
 import 'react-tabs/style/react-tabs.css';
+import './styles.css';
 import {List, ListRowRenderer} from 'react-virtualized/dist/es/List';
+import {AutoSizer} from 'react-virtualized/dist/es/AutoSizer';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import * as React from "react";
 import * as ReactDOM from "react-dom";
@@ -13,7 +15,10 @@ interface Source {
 const FONT_SIZE = 16;
 
 interface State {
-  [task: string]: Source
+  sources: {
+    [task: string]: Source
+  },
+  tabIndex: number;
 }
 
 function rowRendererFactory(source: Source): ListRowRenderer {
@@ -50,7 +55,7 @@ class App extends React.Component<undefined, State> {
         case 'init':
           this.setState((previousState: State) => {
             data.tasks.forEach((task: string) => {
-              previousState[task] = { content: [], changedScrollPosition: false };
+              previousState.sources[task] = { content: [], changedScrollPosition: false };
             });
             return previousState;
           });
@@ -58,7 +63,7 @@ class App extends React.Component<undefined, State> {
 
         case 'output':
           this.setState((previousState: State) => {
-            const previousTask = previousState[data.task];
+            const previousTask = previousState.sources[data.task];
             previousTask.content.push(data.message);;
             return previousState;
           });
@@ -66,52 +71,76 @@ class App extends React.Component<undefined, State> {
       }
     }
 
-    this.state = {};
+    this.state = {
+      sources: {},
+      tabIndex: 0
+    };
+  }
+
+  onTabSelect(tabIndex: number) {
+    this.setState(previousState => {
+      previousState.tabIndex = tabIndex;
+      return previousState;
+    });
   }
 
   render() {
-    const tabPanels = Object.keys(this.state).map((task, i) => {
-      const source = this.state[task];
+    const tabPanels = Object.keys(this.state.sources).map((task, i) => {
+      const source = this.state.sources[task];
 
       const onScroll: OnScroll = ({scrollTop, scrollHeight, clientHeight}) => {
         this.setState(previousState => {
-          previousState[task].changedScrollPosition = Math.abs(scrollTop - scrollHeight) > Math.abs(clientHeight + FONT_SIZE);
+          const changedScrollPosition = Math.abs(scrollTop - scrollHeight) > Math.abs(clientHeight + FONT_SIZE);
+          previousState.sources[task].changedScrollPosition = changedScrollPosition;
           return previousState;
         });
       };
 
-      const scrollToIndexProp = source.changedScrollPosition ?
-        {} :
-        { scrollToIndex: source.content.length - 1 };
+      const scrollToIndexProp = !source.changedScrollPosition ?
+        { scrollToIndex: source.content.length - 1 } :
+        {};
+
+      let className = 'tab-panel-container';
+
+      if (i === this.state.tabIndex) {
+        className = className + ' selected';
+      }
 
       return (
-          <TabPanel key={i}>
-            <List
-              width={1000}
-              height={50}
-              rowHeight={FONT_SIZE}
-              onScroll={onScroll}
-              rowCount={source.content.length}
-              rowRenderer={rowRendererFactory(source)}
-              {...scrollToIndexProp}
-            />
-          </TabPanel>
+          <div key={i} className={className}>
+            <TabPanel className="tab-panel">
+              <AutoSizer>
+                {({ height, width }) =>
+                  (<List
+                    width={width}
+                    height={height}
+                    rowHeight={FONT_SIZE}
+                    onScroll={onScroll}
+                    rowCount={source.content.length}
+                    rowRenderer={rowRendererFactory(source)}
+                    {...scrollToIndexProp}
+                  />
+                )}
+              </AutoSizer>
+            </TabPanel>
+          </div>
       );
     });
 
-    const tabs = Object.keys(this.state).map(task => {
+    const tabs = Object.keys(this.state.sources).map((task, i) => {
       return (
-        <Tab> {task} </Tab>
+        <Tab key={i}> {task} </Tab>
       );
     });
 
     return (
-      <Tabs>
+      <Tabs selectedIndex={this.state.tabIndex} onSelect={this.onTabSelect.bind(this)}>
         <TabList>
           { tabs }
         </TabList>
-
-        { tabPanels }
+        <div style={{ height: '80%' }}>
+          { tabPanels }
+        </div>
       </Tabs>
     );
   }

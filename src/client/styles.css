@@ -1,0 +1,11 @@
+html, body, #app, .react-tabs, .tab-panel-container, .tab-panel {
+  height: 100%;
+}
+
+.tab-panel-container {
+  display: none;
+}
+
+.tab-panel-container.selected {
+  display: block;
+}
