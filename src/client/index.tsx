@@ -138,7 +138,7 @@ class App extends React.Component<undefined, State> {
         <TabList>
           { tabs }
         </TabList>
-        <div style={{ height: '80%' }}>
+        <div className="tab-panels-container">
           { tabPanels }
         </div>
       </Tabs>

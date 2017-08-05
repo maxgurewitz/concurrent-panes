@@ -2,10 +2,33 @@ html, body, #app, .react-tabs, .tab-panel-container, .tab-panel {
   height: 100%;
 }
 
+.react-tabs {
+  position: relative;
+}
+
+.tab-panels-container {
+  position: absolute;
+  top: 34px;
+  bottom: 0;
+  width: 100%;
+  padding: 16px 0 0 16px;
+  box-sizing: border-box;
+}
+
 .tab-panel-container {
   display: none;
 }
 
 .tab-panel-container.selected {
   display: block;
+}
+
+body {
+  margin: 0;
+}
+
+.react-tabs__tab-list {
+  box-sizing: border-box;
+  padding: 4px 0 0 4px;
+  height: 36px;
 }
